@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
           });
 
           deleteButton.className = 'delete-button'; // Add delete button class
-          deleteButton.textContent = 'x'; // Display "x" symbol
+          deleteButton.textContent = ''; // Display "x" symbol
 
           // Delete button click event
           deleteButton.addEventListener('click', () => {
@@ -59,6 +59,13 @@ document.addEventListener('DOMContentLoaded', () => {
       const keywordItem = document.createElement('li');
       keywordItem.textContent = keyword;
       keywordItem.addEventListener('click', highlightKeyword);
+      
+      const deleteButton = document.createElement('span');
+      deleteButton.className = 'delete-button';
+      deleteButton.textContent = '';
+      deleteButton.addEventListener('click', deleteKeyword);
+      
+      keywordItem.appendChild(deleteButton);
       keywordList.appendChild(keywordItem);
     });
   }
@@ -84,14 +91,46 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function highlightKeyword() {
-    var keyword = this.textContent;
+    var keyword = this.textContent.trim();
+    // var keyword = this.textContent;
     var str = keyword;
     str = str.replace(/\s*\(.*?\)\s*/g, '');
     keyword = str;
+    console.log(str);
 
     const documentContent = documentViewer.innerText;
     const regex = new RegExp(`\\b${keyword}\\b`, 'gi');
     const highlightedContent = documentContent.replace(regex, '<span class="highlight">$&</span>');
     documentViewer.innerHTML = highlightedContent;
   }
+  
+  function deleteKeyword(event) {
+    event.stopPropagation();
+    const listItem = this.parentNode;
+    listItem.remove();
+    const currentHighlighted = document.querySelectorAll('.highlight');
+    currentHighlighted.forEach((highlighted) => {
+      highlighted.classList.remove('highlight');
+    });
+  }
+
+   // Add event listener to capture selected text in document viewer
+   documentViewer.addEventListener('mouseup', () => {
+    const selectedText = window.getSelection().toString().trim();
+    if (selectedText) {
+      const keywordItem = document.createElement('li');
+      keywordItem.textContent = selectedText;
+
+      keywordItem.addEventListener('click', highlightKeyword);
+      
+      const deleteButton = document.createElement('span');
+      deleteButton.className = 'delete-button';
+      deleteButton.textContent = '';
+      deleteButton.addEventListener('click', deleteKeyword);
+      
+      keywordItem.appendChild(deleteButton);
+      keywordList.appendChild(keywordItem);
+    }
+  });
+  
 });
